@@ -1,0 +1,17 @@
+Продолжай фичу `work/{feature}` по методологии.
+Сессия: {next_session} из {total_sessions}.
+Границы сессии: только задачи {task_list} (waves {wave_start}-{wave_end}).
+Перед кодом: кратко подтверди scope, риски и проверки.
+После выполнения: остановись, дай отчёт и промт для следующей сессии.
+
+**Фича:** {one_line_description}
+**Прогресс:** Сессии 1-{current_session} завершены (waves 1-{last_completed_wave}).
+
+Прочитай перед стартом:
+- `work/{feature}/logs/session-plan.md` — план сессий
+- `work/{feature}/logs/checkpoint.yml` — текущий прогресс
+- `work/{feature}/tech-spec.md` — секции: {relevant_tech_spec_sections}
+- `work/{feature}/decisions.md` — что уже сделано
+{context_files_block}
+
+Запусти `/do-feature {feature}` — подхватит checkpoint и продолжит с wave {wave_start}.

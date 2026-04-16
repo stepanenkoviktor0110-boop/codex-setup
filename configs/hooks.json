@@ -1,0 +1,14 @@
+{
+  "PreToolUse": [
+    {
+      "matcher": ".*shell.*|.*command.*|.*exec.*",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "bash ~/.codex/hooks/block-dangerous.sh",
+          "timeout": 5000
+        }
+      ]
+    }
+  ]
+}

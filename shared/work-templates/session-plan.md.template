@@ -1,0 +1,33 @@
+---
+status: draft
+---
+
+# Session Plan: {Feature Name}
+
+**Created:** YYYY-MM-DD
+**Total sessions:** N
+**LOC budget per session:** ~1200
+
+---
+
+## Session 1: {Session Title}
+- **Waves:** 1
+- **Tasks:** 1, 2, 3
+- **Estimated LOC:** ~800
+- **Context files:**
+  - `path/to/file1.ts`
+  - `path/to/file2.ts`
+
+## Session 2: {Session Title}
+- **Waves:** 2, 3
+- **Tasks:** 4, 5, 6
+- **Estimated LOC:** ~900
+- **Context files:**
+  - `path/to/file3.ts`
+
+## Session N: Audit & Finalization
+- **Waves:** Audit Wave, Final Wave
+- **Tasks:** {audit and final task numbers}
+- **Estimated LOC:** N/A (review & deploy)
+- **Context files:**
+  - all files from tech-spec "Files to modify"

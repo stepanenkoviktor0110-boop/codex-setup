@@ -1,0 +1,8 @@
+# Codex CLI configuration
+# Docs: https://developers.openai.com/codex/config-reference
+
+model = "gpt-5.4"
+approval_policy = "full-auto"
+
+[features]
+codex_hooks = true

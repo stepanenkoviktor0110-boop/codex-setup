@@ -1,0 +1,36 @@
+# Decisions Log: {Feature Name}
+
+Agent reports on completed tasks. Each entry is written by the agent that executed the task.
+
+---
+
+<!-- Entries are added by agents as tasks are completed.
+
+Format is strict — use only these sections, do not add others.
+Do not include: file lists, findings tables, JSON reports, step-by-step logs.
+Review details — in JSON files via links. QA report — in logs/working/.
+
+## Task N: [title]
+
+**Status:** Done | Done with concerns
+**Commit:** abc1234
+**Agent:** [teammate name or "main agent"]
+**Planned:** [scope from task AC — what was supposed to happen, 1 sentence]
+**Actual:** [what was actually done and key decisions, 1-3 sentences]
+**Deviation:** None / [what changed vs plan and why — enables retrospective to catch patterns]
+**Concerns:** None / [if status is "Done with concerns": what worries you — performance, edge case, code smell, tech debt]
+
+**Reviews:**
+
+*Round 1:*
+- code-reviewer: 2 findings → [logs/working/task-N/code-reviewer-1.json]
+- security-auditor: OK → [logs/working/task-N/security-auditor-1.json]
+
+*Round 2 (after fixes):*
+- code-reviewer: OK → [logs/working/task-N/code-reviewer-2.json]
+
+**Verification:**
+- `npm test` → 42 passed
+- Manual check → OK
+
+-->

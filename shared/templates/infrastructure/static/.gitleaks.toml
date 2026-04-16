@@ -1,0 +1,33 @@
+# Gitleaks configuration
+# Extends default rules with project-specific patterns.
+# Place this file in the project root.
+
+title = "Project gitleaks config"
+
+# Use default rules as base
+[extend]
+# Uncomment to extend from a remote config:
+# useDefault = true
+
+# AWS Access Key ID — catches AKIA patterns including test keys
+[[rules]]
+id = "aws-access-key"
+description = "AWS Access Key ID"
+regex = '''AKIA[0-9A-Z]{16}'''
+tags = ["key", "aws"]
+
+# Generic high-entropy secret (API keys, tokens)
+[[rules]]
+id = "generic-api-key"
+description = "Generic API Key"
+regex = '''(?i)(api[_-]?key|apikey|api[_-]?secret)\s*[:=]\s*['"]?[a-zA-Z0-9_\-]{20,}['"]?'''
+tags = ["key", "generic"]
+
+# Allowlist — paths and patterns to ignore
+[allowlist]
+paths = [
+  '''.gitleaks.toml''',
+  '''\.env\.example''',
+  '''package-lock\.json''',
+  '''pnpm-lock\.yaml''',
+]
