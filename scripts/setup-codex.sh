@@ -81,6 +81,38 @@ fi
 
 step "Шаг 2/7: Codex CLI"
 
+# Ensure npm global prefix is writable without sudo.
+# If npm's current prefix points to a system dir (e.g. /usr/local) where the
+# user has no write access, switch prefix to ~/.npm-global and add it to PATH.
+ensure_npm_prefix_writable() {
+    local current_prefix
+    current_prefix="$(npm prefix -g 2>/dev/null || echo '')"
+    if [ -n "$current_prefix" ] && [ -w "$current_prefix/lib" ] 2>/dev/null; then
+        return 0
+    fi
+    if [ -n "$current_prefix" ] && [ -w "$current_prefix" ]; then
+        return 0
+    fi
+
+    warn "npm глобальный префикс ($current_prefix) недоступен для записи."
+    echo "Переключаю префикс на ~/.npm-global (без sudo)..."
+
+    local NPM_GLOBAL="$HOME/.npm-global"
+    mkdir -p "$NPM_GLOBAL"
+    npm config set prefix "$NPM_GLOBAL"
+    export PATH="$NPM_GLOBAL/bin:$PATH"
+
+    local SHELL_RC="$HOME/.zshrc"
+    if ! grep -q '.npm-global/bin' "$SHELL_RC" 2>/dev/null; then
+        echo '' >> "$SHELL_RC"
+        echo '# npm global prefix (configured by codex-setup)' >> "$SHELL_RC"
+        echo 'export PATH="$HOME/.npm-global/bin:$PATH"' >> "$SHELL_RC"
+    fi
+    ok "npm префикс переключён на $NPM_GLOBAL"
+}
+
+ensure_npm_prefix_writable
+
 if command -v codex &>/dev/null; then
     ok "Codex CLI уже установлен ($(codex --version 2>/dev/null || echo 'version unknown'))"
     echo "Обновляю до последней версии..."
