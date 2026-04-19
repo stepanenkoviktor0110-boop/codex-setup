@@ -199,7 +199,7 @@ else
     echo "Codex CLI работает через подписку ChatGPT (Plus, Pro, Business, Edu)."
     echo "Сейчас откроется браузер для входа в аккаунт OpenAI."
     echo ""
-    echo -e "${YELLOW}⚠ Нужна активная подписка ChatGPT Plus ($20/мес) или Pro ($200/мес).${NC}"
+    echo -e "${YELLOW}⚠ Нужна активная подписка ChatGPT Plus (\$20/мес) или Pro (\$200/мес).${NC}"
     echo "  Подробнее: https://help.openai.com/en/articles/11369540-using-codex-with-your-chatgpt-plan"
     echo ""
     read -rp "Нажми Enter, чтобы открыть браузер для входа... " _
