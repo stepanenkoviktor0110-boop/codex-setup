@@ -82,26 +82,28 @@ fi
 step "Шаг 2/7: Codex CLI"
 
 # Ensure npm global prefix is writable without sudo.
-# If npm's current prefix points to a system dir (e.g. /usr/local) where the
-# user has no write access, switch prefix to ~/.npm-global and add it to PATH.
-ensure_npm_prefix_writable() {
-    local current_prefix
-    current_prefix="$(npm prefix -g 2>/dev/null || echo '')"
-    if [ -n "$current_prefix" ] && [ -w "$current_prefix/lib" ] 2>/dev/null; then
+# Reliably detect write access by attempting to create a temp file in the
+# prefix's lib dir (macOS ACL can make `test -w` lie). If not writable,
+# switch prefix to ~/.npm-global and add it to PATH.
+NPM_GLOBAL="$HOME/.npm-global"
+
+npm_prefix_is_writable() {
+    local prefix="$1"
+    [ -z "$prefix" ] && return 1
+    local lib_dir="$prefix/lib/node_modules"
+    [ -d "$lib_dir" ] || lib_dir="$prefix"
+    local probe="$lib_dir/.codex-setup-write-probe.$$"
+    if ( : > "$probe" ) 2>/dev/null; then
+        rm -f "$probe"
         return 0
     fi
-    if [ -n "$current_prefix" ] && [ -w "$current_prefix" ]; then
-        return 0
-    fi
+    return 1
+}
 
-    warn "npm глобальный префикс ($current_prefix) недоступен для записи."
-    echo "Переключаю префикс на ~/.npm-global (без sudo)..."
-
-    local NPM_GLOBAL="$HOME/.npm-global"
+switch_npm_prefix_to_home() {
     mkdir -p "$NPM_GLOBAL"
     npm config set prefix "$NPM_GLOBAL"
     export PATH="$NPM_GLOBAL/bin:$PATH"
-
     local SHELL_RC="$HOME/.zshrc"
     if ! grep -q '.npm-global/bin' "$SHELL_RC" 2>/dev/null; then
         echo '' >> "$SHELL_RC"
@@ -111,7 +113,25 @@ ensure_npm_prefix_writable() {
     ok "npm префикс переключён на $NPM_GLOBAL"
 }
 
-ensure_npm_prefix_writable
+CURRENT_PREFIX="$(npm prefix -g 2>/dev/null || echo '')"
+if ! npm_prefix_is_writable "$CURRENT_PREFIX"; then
+    warn "npm глобальный префикс ($CURRENT_PREFIX) недоступен для записи."
+    echo "Переключаю префикс на $NPM_GLOBAL (без sudo)..."
+    switch_npm_prefix_to_home
+fi
+
+# If codex is already installed in a non-writable system prefix (e.g. after
+# an earlier `sudo npm install -g`), remove it so we can reinstall cleanly
+# into the writable prefix.
+if command -v codex &>/dev/null; then
+    CODEX_BIN="$(command -v codex)"
+    CODEX_ROOT="$(cd "$(dirname "$CODEX_BIN")/.." && pwd)"
+    if [ "$CODEX_ROOT" != "$NPM_GLOBAL" ] && ! npm_prefix_is_writable "$CODEX_ROOT"; then
+        warn "Codex CLI установлен в системной папке ($CODEX_ROOT) — удаляю через sudo, чтобы переустановить без sudo."
+        sudo npm uninstall -g @openai/codex 2>/dev/null || true
+        hash -r 2>/dev/null || true
+    fi
+fi
 
 if command -v codex &>/dev/null; then
     ok "Codex CLI уже установлен ($(codex --version 2>/dev/null || echo 'version unknown'))"
