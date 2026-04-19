@@ -120,6 +120,14 @@ if ! npm_prefix_is_writable "$CURRENT_PREFIX"; then
     switch_npm_prefix_to_home
 fi
 
+# Ensure ~/.npm-global/bin is on PATH in the current shell even when the
+# prefix was already configured on a previous run (in which case
+# switch_npm_prefix_to_home is not called and the current shell never
+# gets the export).
+if [ -d "$NPM_GLOBAL/bin" ] && [[ ":$PATH:" != *":$NPM_GLOBAL/bin:"* ]]; then
+    export PATH="$NPM_GLOBAL/bin:$PATH"
+fi
+
 # Fix npm cache ownership: a prior `sudo npm install` can leave files in
 # ~/.npm owned by root, which breaks subsequent non-sudo installs.
 NPM_CACHE="$HOME/.npm"
