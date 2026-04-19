@@ -134,15 +134,22 @@ if [ -d "$NPM_CACHE" ]; then
 fi
 
 # If codex is already installed in a non-writable system prefix (e.g. after
-# an earlier `sudo npm install -g`), remove it so we can reinstall cleanly
-# into the writable prefix.
+# an earlier `sudo npm install -g`), remove it by deleting the files directly.
+# We do NOT call `sudo npm uninstall` here: sudo npm would see the just-
+# switched prefix ($NPM_GLOBAL) and create root-owned files inside it,
+# breaking subsequent non-sudo installs.
 if command -v codex &>/dev/null; then
     CODEX_BIN="$(command -v codex)"
     CODEX_ROOT="$(cd "$(dirname "$CODEX_BIN")/.." && pwd)"
     if [ "$CODEX_ROOT" != "$NPM_GLOBAL" ] && ! npm_prefix_is_writable "$CODEX_ROOT"; then
-        warn "Codex CLI установлен в системной папке ($CODEX_ROOT) — удаляю через sudo, чтобы переустановить без sudo."
-        sudo npm uninstall -g @openai/codex 2>/dev/null || true
+        warn "Codex CLI установлен в системной папке ($CODEX_ROOT) — удаляю файлы напрямую через sudo."
+        sudo rm -rf \
+            "$CODEX_ROOT/lib/node_modules/@openai" \
+            "$CODEX_ROOT/lib/node_modules/codex-cli" \
+            "$CODEX_ROOT/lib/node_modules/@openai/codex" \
+            "$CODEX_BIN" 2>/dev/null || true
         hash -r 2>/dev/null || true
+        ok "Системная установка Codex CLI удалена"
     fi
 fi
 
