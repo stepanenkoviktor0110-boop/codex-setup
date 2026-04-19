@@ -204,10 +204,11 @@ else
     echo ""
     read -rp "Нажми Enter, чтобы открыть браузер для входа... " _
 
-    if codex login 2>/dev/null; then
+    if codex login; then
         ok "Авторизация прошла успешно"
     else
         warn "Авторизация не завершена. Запусти позже: codex login"
+        echo "  Если браузер не открылся автоматически — скопируй URL из вывода выше в браузер вручную."
     fi
 fi
 
