@@ -120,6 +120,19 @@ if ! npm_prefix_is_writable "$CURRENT_PREFIX"; then
     switch_npm_prefix_to_home
 fi
 
+# Fix npm cache ownership: a prior `sudo npm install` can leave files in
+# ~/.npm owned by root, which breaks subsequent non-sudo installs.
+NPM_CACHE="$HOME/.npm"
+if [ -d "$NPM_CACHE" ]; then
+    USER_UID="$(id -u)"
+    USER_GID="$(id -g)"
+    if [ -n "$(find "$NPM_CACHE" -not -user "$USER_UID" -print -quit 2>/dev/null)" ]; then
+        warn "npm cache ($NPM_CACHE) содержит файлы, принадлежащие root — чиню владельца через sudo."
+        sudo chown -R "$USER_UID:$USER_GID" "$NPM_CACHE"
+        ok "Владелец $NPM_CACHE восстановлен"
+    fi
+fi
+
 # If codex is already installed in a non-writable system prefix (e.g. after
 # an earlier `sudo npm install -g`), remove it so we can reinstall cleanly
 # into the writable prefix.
