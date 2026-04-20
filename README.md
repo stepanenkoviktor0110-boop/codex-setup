@@ -44,6 +44,7 @@ bash scripts/setup-codex.sh
 - Терминал (Terminal.app или iTerm2)
 - Интернет-соединение
 - Подписка ChatGPT Plus ($20/мес) или Pro ($200/мес)
+- **VPN с выходом в поддерживаемую страну** (US/ЕС и т.п.), если ты в РФ/Беларуси — OpenAI блокирует доступ по IP. Без VPN шаг авторизации упадёт с `Country, region, or territory not supported`.
 
 ## Повторный запуск
 

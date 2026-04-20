@@ -58,13 +58,21 @@ npm install -g @openai/codex@latest
 
 Подожди 10-30 секунд.
 
-Если появится ошибка с правами доступа (`EACCES`):
+### Если появится ошибка `EACCES` (permission denied)
+
+Это значит, что Node установлен системно (в `/usr/local`), и npm не может писать туда без root. **Не используй `sudo`** — это создаёт файлы, принадлежащие root, в домашней папке и всё ломает ещё сильнее.
+
+Правильное решение — переключить npm на пользовательский префикс:
 
 ```bash
-sudo npm install -g @openai/codex@latest
+mkdir -p ~/.npm-global
+npm config set prefix ~/.npm-global
+echo 'export PATH="$HOME/.npm-global/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
+npm install -g @openai/codex@latest
 ```
 
-Введи пароль от Mac (символы не будут отображаться — это нормально).
+**Автоматический скрипт `scripts/setup-codex.sh` делает всё это сам** — включая починку прав на кэш `~/.npm` и удаление старых системных установок, если ты раньше пробовал `sudo npm install`.
 
 ### Альтернативный способ — Homebrew
 
@@ -127,19 +135,18 @@ npx @openai/codex@latest
 
 ### Ошибка прав доступа (EACCES) при установке
 
-Вариант 1 — используй `sudo`:
+**Не используй `sudo npm install`** — это создаст файлы, принадлежащие root, в твоей домашней папке и сломает все последующие установки без sudo.
+
+Правильно: переключить npm на пользовательский префикс (см. выше) или запустить `bash scripts/setup-codex.sh` — он делает всё автоматически.
+
+Если `sudo npm install` уже был сделан и всё сломалось, почини одной командой:
 
 ```bash
-sudo npm install -g @openai/codex@latest
+sudo chown -R $(id -u):$(id -g) ~/.npm ~/.npm-global 2>/dev/null
+sudo rm -rf /usr/local/lib/node_modules/@openai /usr/local/lib/node_modules/codex-cli /usr/local/bin/codex
 ```
 
-Вариант 2 — измени владельца папки npm (решает проблему навсегда):
-
-```bash
-sudo chown -R $(whoami) $(npm config get prefix)/{lib/node_modules,bin,share}
-```
-
-После этого повтори шаг 2 без `sudo`.
+Потом повтори шаг 2 без `sudo`.
 
 ### Старая версия Node.js
 
